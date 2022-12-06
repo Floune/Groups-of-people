@@ -1,0 +1,2 @@
+python-vlc==3.0.18121
+readchar==4.0.3
