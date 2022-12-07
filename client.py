@@ -4,23 +4,39 @@ import sys
 from input import * 
 from gui import *
 from radio import Radio
+from chat import Chat
 
 input_queue = queue.Queue()
 gui_queue = queue.Queue()
 
-def pagedead(config, command):
-	mode = 0
-	config["debug"] = "pagedead requested"
+def pagedead(config, command, radio, chat):
+	config["mode"] = 0
+	config["debug"] = command
 
-def radiof(config, command):
-	mode = 1
-	config["debug"] = "radio requested"
+def radiof(config, command, radio, chat):	
+	config["mode"] = 1
 
+	if command in config["arrows"]:
+		config["debug"] = "megaradio" + command
+		radio.updateSelection(command)
+
+	elif command == "":
+		radio.select()
+
+def chatf(config, command, radio, chat):
+	config["mode"] = 2
+	if command:
+		chat.sendMessage(command)
 
 def main(stdscr):
+	SERVER_ADDRESS = '127.0.0.1'
+	SERVER_PORT = 12000
+	connection = socket.socket()
+	connection.connect((SERVER_ADDRESS, SERVER_PORT))
 	config = {
+		'arrows' : ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT"],
 		'debug': "debug zone",
-		'commands' : ['help', 'radio'],
+		'commands' : ['help', 'radio', 'chat'],
 		'modes': {
 			0 : {
 				"title": "Page Dead",
@@ -29,9 +45,13 @@ def main(stdscr):
 			1 : {
 				"title": "Radio",
 				"func": radiof
+			},
+			2: {
+				"title": "Chat",
+				"func": chatf
 			}
 		},
-		'mode': 0
+		'mode': 1
 
 	}
 
@@ -41,43 +61,67 @@ def main(stdscr):
 	initTeams(stdscr, toolBox, mainBox, txtBox)
 
 	radio = Radio()
+	chat = Chat(curses.LINES - 17, connection, gui_queue)
 
 	writeThread = threading.Thread(target=waitInput, args=(input_queue, txtBox))
 	writeThread.start()
-	logicThread = threading.Thread(target=logicLoop, args=(config, input_queue, gui_queue))
+	logicThread = threading.Thread(target=logicLoop, args=(config, input_queue, gui_queue, radio, chat))
 	logicThread.start()
-	guiThread = threading.Thread(target=gui, args=(config, gui_queue, txtBox, toolBox, mainBox))
+	guiThread = threading.Thread(target=gui, args=(config, gui_queue, txtBox, toolBox, mainBox, radio, chat))
 	guiThread.start()
-
+	receiveThread = threading.Thread(target=receiveChat, args=(connection, gui_queue, chat))
+	receiveThread.start()
 
 	writeThread.join()
-	mainThread.join()
+	logicThread.join()
 	guiThread.join()
+	receiveThread.join()
 
 
-def logicLoop(config, input_q, gui_q):
+
+def receiveChat(connection, gui_q, chat):
+	while True:
+		try:
+			msg = connection.recv(1024)
+			if msg:
+				decoded = msg.decode()
+				chat.addMessage(decoded)
+				gui_q.put("q")
+			else:
+				connection.close()
+				break
+
+		except Exception as e:
+			connection.close()
+			break
+
+
+
+def logicLoop(config, input_q, gui_q, radio, chat):
 
 	command = ""
 	while command != "/quit":
 		command = input_q.get()
 
-		if command[0] == "/":
-			handleCommand(config, command[1:])
+		handleCommand(config, command, radio, chat)
 
 		gui_q.put(command)
 
 	endTeams()
 
-def handleCommand(config, command):
-	if command in config["commands"]:
-		config["mode"] = config["commands"].index(command)
-		config["modes"][config["mode"]]["func"](config, command)
+def handleCommand(config, command, radio, chat):
+	if len(command) > 0 and command[0] == "/" and command[1:] in config["commands"]:
+		config["mode"] = config["commands"].index(command[1:])
+		config["modes"][config["mode"]]["func"](config, command, radio, chat)
+	else:
+		config["modes"][config["mode"]]["func"](config, command, radio, chat)
 
 def initTeams(stdscr, toolBox, mainBox, txtBox):
 	curses.noecho()
 	curses.cbreak()
 	stdscr.clear()
 	curses.curs_set(False)
+	txtBox.keypad(True)
 	toolBox.box()
 	mainBox.box()
 	txtBox.box()

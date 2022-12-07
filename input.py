@@ -10,20 +10,28 @@ def updateInputLine(buffer, txtBox):
 		if len(buffer) < curses.COLS * 2 - 6:
 			txtBox.addstr(j, i, char)
 			i+=1
-	txtBox.refresh()
 
 def waitInput(q, txtBox):
 	buffer = []
+	arrows = ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT"]
 	last = -1
 	inp = ""
 	while inp != "/quit":
 		last = txtBox.getkey(2, 2)
-		if last == '\n':
+
+		if last in arrows:
+			buffer = []
+			q.put(last)
+		elif last == "KEY_BACKSPACE":
+			buffer.pop()
+			txtBox.clear()
+			txtBox.box()
+			updateInputLine(buffer, txtBox)
+			txtBox.refresh()
+		elif last == '\n':
 			inp = "".join(buffer)
 			q.put(inp)
 			buffer = []
-		# if last in self.arrows:
-		#   q.put(last)
 		elif len(buffer) < curses.COLS * 2 - 6:
 			buffer.append(last)
 			updateInputLine(buffer, txtBox)
