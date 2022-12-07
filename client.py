@@ -1,40 +1,21 @@
 import socket, threading, queue
 import curses
 import sys
+import os
 from input import * 
 from gui import *
-from radio import Radio
-from chat import Chat
+from radio import *
+from chat import *
+from manpage import *
 
 input_queue = queue.Queue()
 gui_queue = queue.Queue()
 
-def pagedead(config, command, radio, chat):
-	config["mode"] = 0
-	config["debug"] = command
 
-def radiof(config, command, radio, chat):	
-	config["mode"] = 1
-
-	if command in config["arrows"]:
-		config["debug"] = "megaradio" + command
-		radio.updateSelection(command)
-
-	elif command == "":
-		radio.select()
-
-def chatf(config, command, radio, chat):
-	config["mode"] = 2
-	if command:
-		chat.sendMessage(command)
 
 def main(stdscr):
-	SERVER_ADDRESS = '127.0.0.1'
-	SERVER_PORT = 13000
-	connection = socket.socket()
-	connection.connect((SERVER_ADDRESS, SERVER_PORT))
 	config = {
-		'arrows' : ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT"],
+		'arrows' : ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT", "KEY_BACKSPACE"],
 		'debug': "debug zone",
 		'commands' : ['help', 'radio', 'chat'],
 		'modes': {
@@ -54,7 +35,8 @@ def main(stdscr):
 		'mode': 1
 
 	}
-
+	connection = socket.socket()
+	connection.connect((os.environ.get('FLOUNE_CHAT_SERVER', 'localhost'), int(os.environ.get('FLOUNE_CHAT_PORT', 13000))))
 	txtBox = curses.newwin(4, curses.COLS, curses.LINES - 5, 0)
 	toolBox = curses.newwin(7, curses.COLS, 0, 0)
 	mainBox = curses.newwin(curses.LINES - 12, curses.COLS, 7, 0)
@@ -76,28 +58,6 @@ def main(stdscr):
 	receiveThread.join()
 	logicThread.join()
 	guiThread.join()
-
-
-
-def receiveChat(connection, gui_q, chat):
-	while True:
-		try:
-			msg = connection.recv(1024)
-			if msg:
-				decoded = msg.decode()
-				if decoded[0] == "/":
-					chat.addMessage("command received from server")
-				else:
-					chat.addMessage(decoded)
-				gui_q.put("q")
-			else:
-				connection.close()
-				break
-
-		except Exception as e:
-			connection.close()
-			break
-
 
 
 def logicLoop(config, input_q, gui_q, radio, chat):

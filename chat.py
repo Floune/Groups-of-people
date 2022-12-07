@@ -20,3 +20,29 @@ class Chat:
 				self.messages.pop(0)
 
 
+
+
+def chatf(config, command, radio, chat):
+	config["mode"] = 2
+	if command and command not in config["arrows"]:
+		chat.sendMessage(command)
+
+def receiveChat(connection, gui_q, chat):
+	while True:
+		try:
+			msg = connection.recv(1024)
+			if msg:
+				decoded = msg.decode()
+				if decoded[0] == "/":
+					chat.addMessage("command received from server")
+				else:
+					chat.addMessage(decoded)
+				gui_q.put("q")
+			else:
+				connection.close()
+				break
+
+		except Exception as e:
+			connection.close()
+			break
+

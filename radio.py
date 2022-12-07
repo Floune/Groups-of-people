@@ -46,3 +46,13 @@ class Radio:
 			self.player.stop()
 
 	
+
+def radiof(config, command, radio, chat):	
+	config["mode"] = 1
+
+	if command in config["arrows"]:
+		config["debug"] = "megaradio" + command
+		radio.updateSelection(command)
+
+	elif command == "":
+		radio.select()

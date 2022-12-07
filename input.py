@@ -22,7 +22,7 @@ def waitInput(q, txtBox):
 		if last in arrows:
 			buffer = []
 			q.put(last)
-		elif last == "KEY_BACKSPACE":
+		elif last == "KEY_BACKSPACE" and len(buffer) > 0:
 			buffer.pop()
 			txtBox.clear()
 			txtBox.box()
@@ -32,6 +32,6 @@ def waitInput(q, txtBox):
 			inp = "".join(buffer)
 			q.put(inp)
 			buffer = []
-		elif len(buffer) < curses.COLS * 2 - 6:
+		elif len(buffer) < curses.COLS * 2 - 6 and last != "KEY_BACKSPACE":
 			buffer.append(last)
 			updateInputLine(buffer, txtBox)
