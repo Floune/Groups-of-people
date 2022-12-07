@@ -30,7 +30,7 @@ def chatf(config, command, radio, chat):
 
 def main(stdscr):
 	SERVER_ADDRESS = '127.0.0.1'
-	SERVER_PORT = 12000
+	SERVER_PORT = 13000
 	connection = socket.socket()
 	connection.connect((SERVER_ADDRESS, SERVER_PORT))
 	config = {
@@ -71,11 +71,11 @@ def main(stdscr):
 	guiThread.start()
 	receiveThread = threading.Thread(target=receiveChat, args=(connection, gui_queue, chat))
 	receiveThread.start()
-
+	
 	writeThread.join()
+	receiveThread.join()
 	logicThread.join()
 	guiThread.join()
-	receiveThread.join()
 
 
 
@@ -85,7 +85,10 @@ def receiveChat(connection, gui_q, chat):
 			msg = connection.recv(1024)
 			if msg:
 				decoded = msg.decode()
-				chat.addMessage(decoded)
+				if decoded[0] == "/":
+					chat.addMessage("command received from server")
+				else:
+					chat.addMessage(decoded)
 				gui_q.put("q")
 			else:
 				connection.close()
@@ -98,7 +101,6 @@ def receiveChat(connection, gui_q, chat):
 
 
 def logicLoop(config, input_q, gui_q, radio, chat):
-
 	command = ""
 	while command != "/quit":
 		command = input_q.get()
@@ -107,6 +109,7 @@ def logicLoop(config, input_q, gui_q, radio, chat):
 
 		gui_q.put(command)
 
+	chat.sendMessage("/quit")
 	endTeams()
 
 def handleCommand(config, command, radio, chat):
