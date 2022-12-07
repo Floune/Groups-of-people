@@ -8,12 +8,31 @@ from radio import Radio
 input_queue = queue.Queue()
 gui_queue = queue.Queue()
 
+def pagedead(config, command):
+	mode = 0
+	config["debug"] = "pagedead requested"
+
+def radiof(config, command):
+	mode = 1
+	config["debug"] = "radio requested"
+
 
 def main(stdscr):
 	config = {
 		'debug': "debug zone",
-		'modes': ["Page Dead", "Radio"],
+		'commands' : ['help', 'radio'],
+		'modes': {
+			0 : {
+				"title": "Page Dead",
+				"func": pagedead
+			},
+			1 : {
+				"title": "Radio",
+				"func": radiof
+			}
+		},
 		'mode': 0
+
 	}
 
 	txtBox = curses.newwin(4, curses.COLS, curses.LINES - 5, 0)
@@ -50,8 +69,10 @@ def logicLoop(config, input_q, gui_q):
 	endTeams()
 
 def handleCommand(config, command):
-	config["debug"] = command
-	
+	if command in config["commands"]:
+		config["mode"] = config["commands"].index(command)
+		config["modes"][config["mode"]]["func"](config, command)
+
 def initTeams(stdscr, toolBox, mainBox, txtBox):
 	curses.noecho()
 	curses.cbreak()

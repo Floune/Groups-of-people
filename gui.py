@@ -17,6 +17,6 @@ def gui(config, gui_q, txtBox, toolBox, mainBox):
 		mainBox.refresh()
 
 def tools(toolBox, config):
-	toolBox.addstr(2, int(curses.COLS / 2 - 3), config["modes"][config["mode"]])
+	toolBox.addstr(2, int(curses.COLS / 2 - 3), config["modes"][config["mode"]]["title"])
 	toolBox.addstr(2, 2, config["debug"])
 	toolBox.refresh()
