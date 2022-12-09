@@ -33,8 +33,9 @@ def receiveChat(connection, gui_q, chat):
 			msg = connection.recv(1024)
 			if msg:
 				decoded = msg.decode()
-				if decoded[0] == "/":
-					chat.addMessage("command received from server")
+				if "###nickname###" in decoded:
+					splited = decoded.split(" - ")
+					chat.nickname = splited[1]
 				else:
 					chat.addMessage(decoded)
 				gui_q.put("q")

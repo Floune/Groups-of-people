@@ -60,15 +60,19 @@ def main(mainBox, config, radio, chat, tracker):
 		mainBox.clear()
 		i = 1
 		for m in chat.messages:
-			splited = m.split(" - ")
-			sender = splited[0]
-			msg = splited[1]
-			mainBox.addstr(i, 1, str(sender), curses.color_pair(2))
-			mainBox.addstr(i, 2 + len(sender), str(msg))
-			if len(m) > curses.COLS:
-				i += 2
-			else:
-				i+=1
+			if len(m.split(" - ")) > 1:
+				splited = m.split(" - ")
+				sender = splited[0]
+				msg = splited[1]
+				if sender == chat.nickname:
+					mainBox.addstr(i, 1, str(sender), curses.color_pair(2))
+				else:
+					mainBox.addstr(i, 1, str(sender), curses.color_pair(1))
+				mainBox.addstr(i, 2 + len(sender), str(msg))
+				if len(m) > curses.COLS:
+					i += 2
+				else:
+					i+=1
 
 	elif config["mode"] == 3:
 		mainBox.clear()
