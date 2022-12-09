@@ -1,12 +1,14 @@
 import curses
+from datetime import date, datetime
 
-def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat):
+
+def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker):
 	command = ""
 	i=1
 
 	while command != "/quit":
 		tools(toolBox, config, chat)
-		main(mainBox, config, radio, chat)
+		main(mainBox, config, radio, chat, tracker)
 		command = gui_q.get()
 		# if command:
 		# 	mainBox.addstr(i, 2, str(command))
@@ -18,20 +20,29 @@ def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat):
 
 def tools(toolBox, config, chat):
 	toolBox.clear()
-	toolBox.addstr(2, int(curses.COLS / 2 - 3), config["modes"][config["mode"]]["title"])
+	title = config["modes"][config["mode"]]["title"]
+	margin = int(curses.COLS / 2 - len(title) / 2)
+	toolBox.addstr(2, margin, title)
 	toolBox.addstr(2, 2, str(config["mode"]))
 	toolBox.box()
 	toolBox.refresh()
 
-def main(mainBox, config, radio, chat):
+def main(mainBox, config, radio, chat, tracker):
 	if config["mode"] == 0:
 		mainBox.clear()
-		mainBox.addstr(2, 2, "Guide")
+		mainBox.addstr(2, 2, "Navigation")
 		mainBox.addstr(3, 2, "=====")
 		mainBox.addstr(5, 2, "Radio : /radio")
 		mainBox.addstr(6, 2, "Chat : /chat")
 		mainBox.addstr(7, 2, "Aide : /help")
-		mainBox.addstr(8, 2, "Quitter : /quit")
+		mainBox.addstr(8, 2, "Tracker : /tracker")
+
+		mainBox.addstr(10, 2, "Activity tracker")
+		mainBox.addstr(11, 2, "================")
+		mainBox.addstr(13, 2, "Track project : /workon <project>")
+		mainBox.addstr(14, 2, "Undo action : /undo")
+
+		mainBox.addstr(16, 2, "Quitter : /quit")
 
 	elif config["mode"] == 1:
 		mainBox.clear()
@@ -50,12 +61,45 @@ def main(mainBox, config, radio, chat):
 		mainBox.clear()
 		i = 1
 		for m in chat.messages:
-			mainBox.addstr(i, 1, str(m))
+			splited = m.split(" - ")
+			sender = splited[0]
+			msg = splited[1]
+			mainBox.addstr(i, 1, str(sender), curses.color_pair(2))
+			mainBox.addstr(i, 2 + len(sender), str(msg))
 			if len(m) > curses.COLS:
 				i += 2
 			else:
 				i+=1
-		mainBox.box()
+
+	elif config["mode"] == 3:
+		mainBox.clear()
+		i = 2
+		x = 0
+		total = tracker.getActivity()
+		if len(tracker.getActivity()) > 0:
+			offset = 7 
+			mainBox.addstr(i, offset + 1, "<", curses.color_pair(2))
+			mainBox.addstr(i, offset + 3, "{}".format(total[tracker.selectedDay]["date"]))
+			mainBox.addstr(i, offset + 12, ">".format(total[tracker.selectedDay]["date"]), curses.color_pair(2))
+			i+=2
+
+			mainBox.addstr(i, 2, "Projet", curses.color_pair(2))
+			mainBox.addstr(i, 20, "Durée", curses.color_pair(2))
+			i+=2
+			if len(total[tracker.selectedDay]["activity"]) == 1:
+				for k, a in total[tracker.selectedDay]["activity"].items():
+					mainBox.addstr(i, 2, "Début de journée à {} sur {}".format(k, a))
+			else:
+				for k, a in total[tracker.selectedDay]["activity"].items():
+					if x > 0:
+						duree = datetime.strptime(k, '%H:%M:%S') - datetime.strptime(previousKey, '%H:%M:%S')
+						mainBox.addstr(i, 2, previousValue)
+						mainBox.addstr(i, 21,"{}".format(duree))
+					previousKey = k
+					previousValue = a
+					i+=1
+					x+=1
+				mainBox.addstr(i + 1, 2 , "Currently working on {} since {}".format(tracker.current, tracker.last))
 
 	mainBox.box()
 	mainBox.refresh()

@@ -32,6 +32,6 @@ def waitInput(q, txtBox):
 			inp = "".join(buffer)
 			q.put(inp)
 			buffer = []
-		elif len(buffer) < curses.COLS * 2 - 6 and last != "KEY_BACKSPACE":
+		elif len(buffer) < curses.COLS * 2 - 26 and last != "KEY_BACKSPACE":
 			buffer.append(last)
 			updateInputLine(buffer, txtBox)

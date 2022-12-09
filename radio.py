@@ -10,6 +10,7 @@ class Radio:
 			"Culture": "https://stream.radiofrance.fr/franceculture/franceculture_midfi.m3u8?id=radiofrance",
 			"NHK": "https://mtist.as.smartstream.ne.jp/30068/livestream/chunklist.m3u8",
 			"Algérie": "https://webradio.tda.dz/Adrar_64K.mp3",
+			"BBC": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
 			"STOP": "lqlskdjlqkjsd"
 		}
 		self.currentlyPlaying = "Nothing"
@@ -47,7 +48,7 @@ class Radio:
 
 	
 
-def radiof(config, command, radio, chat):	
+def radiof(config, command, radio, chat, tracker):	
 	config["mode"] = 1
 
 	if command in config["arrows"]:
