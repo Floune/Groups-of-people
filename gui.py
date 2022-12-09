@@ -30,19 +30,18 @@ def tools(toolBox, config, chat):
 def main(mainBox, config, radio, chat, tracker):
 	if config["mode"] == 0:
 		mainBox.clear()
-		mainBox.addstr(2, 2, "Navigation")
-		mainBox.addstr(3, 2, "=====")
-		mainBox.addstr(5, 2, "Radio : /radio")
-		mainBox.addstr(6, 2, "Chat : /chat")
-		mainBox.addstr(7, 2, "Aide : /help")
-		mainBox.addstr(8, 2, "Tracker : /tracker")
+		mainBox.addstr(2, 2, "Navigation", curses.color_pair(2))
+		mainBox.addstr(4, 2, "Radio : /radio")
+		mainBox.addstr(5, 2, "Chat : /chat")
+		mainBox.addstr(6, 2, "Aide : /help")
+		mainBox.addstr(7, 2, "Tracker : /tracker")
 
-		mainBox.addstr(10, 2, "Activity tracker")
-		mainBox.addstr(11, 2, "================")
-		mainBox.addstr(13, 2, "Track project : /workon <project>")
-		mainBox.addstr(14, 2, "Undo action : /undo")
+		mainBox.addstr(9, 2, "Activity tracker", curses.color_pair(2))
+		mainBox.addstr(11, 2, "Track project : /workon <project>")
+		mainBox.addstr(12, 2, "Change week : left and right arrows")
+		mainBox.addstr(13, 2, "Undo action : /undo")
 
-		mainBox.addstr(16, 2, "Quitter : /quit")
+		mainBox.addstr(14, 2, "Quitter : /quit")
 
 	elif config["mode"] == 1:
 		mainBox.clear()
