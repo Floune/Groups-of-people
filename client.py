@@ -42,7 +42,7 @@ def main(stdscr):
 				"func": trackf
 			}
 		},
-		'mode': 1
+		'mode': 0
 
 	}
 	radio = Radio()
