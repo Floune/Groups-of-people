@@ -8,6 +8,7 @@ class Chat:
 		self.gui_q = gui_q
 		self.connection = connection
 		self.messages = []
+		self.nickname = ""
 
 	def sendMessage(self, msg):
 		if msg and isinstance(msg, str):
