@@ -1,5 +1,7 @@
 import curses
 import socket, threading
+import vlc
+import time
 
 class Chat:
 
@@ -34,6 +36,7 @@ def receiveChat(connection, gui_q, chat):
 			msg = connection.recv(1024)
 			if msg:
 				decoded = msg.decode()
+				maybePlaySound(decoded)
 				if "###nickname###" in decoded:
 					splited = decoded.split(" - ")
 					chat.nickname = splited[1]
@@ -48,3 +51,20 @@ def receiveChat(connection, gui_q, chat):
 			connection.close()
 			break
 
+
+def maybePlaySound(decoded):
+	keywords = ["lol", "^^", "haha", "prout", "bravo"]
+	sounds = {
+		"lol" : "laugh.mp3",
+		"^^": "laugh.mp3",
+		"haha": "laugh.mp3",
+		"prout": "fart.mp3",
+		"bravo": "applause.mp3"
+	}
+	splited = decoded.split(" - ")
+	keyword = splited[1]
+	if keyword in keywords:
+		player = vlc.MediaPlayer(sounds[keyword])
+		player.play()
+		time.sleep(2)
+		player.release()

@@ -37,16 +37,16 @@ def main(mainBox, config, radio, chat, tracker):
 		mainBox.addstr(7, 2, "Tracker : /tracker")
 
 		mainBox.addstr(9, 2, "Activity tracker", curses.color_pair(2))
-		mainBox.addstr(11, 2, "Track project : /workon <project>")
-		mainBox.addstr(12, 2, "Change week : left and right arrows")
-		mainBox.addstr(13, 2, "Undo action : /undo")
+		mainBox.addstr(11, 2, "Tracker un projet : /workon <project>")
+		mainBox.addstr(12, 2, "Changer de semaine : flèches gauche/droite")
+		mainBox.addstr(13, 2, "Undo : /undo")
 
 		mainBox.addstr(14, 2, "Quitter : /quit")
 
 	elif config["mode"] == 1:
 		mainBox.clear()
 		mainBox.addstr(1, 1, "Radio: {}".format(radio.currentlyPlaying))
-		mainBox.addstr(2, 1, "Song: {}".format(radio.song))
+		mainBox.addstr(2, 1, "Chanson: {}".format(radio.song))
 		i = 4
 		for r, url in radio.radios.items():
 			if radio.selected == i - 3:
@@ -80,10 +80,10 @@ def main(mainBox, config, radio, chat, tracker):
 		x = 0
 		total = tracker.getActivity()
 		if len(tracker.getActivity()) > 0:
-			offset = 7 
-			mainBox.addstr(i, offset + 1, "<", curses.color_pair(2))
-			mainBox.addstr(i, offset + 3, "{}".format(total[tracker.selectedDay]["date"]))
-			mainBox.addstr(i, offset + 12, ">".format(total[tracker.selectedDay]["date"]), curses.color_pair(2))
+			headerOffset = 7 
+			mainBox.addstr(i, headerOffset + 1, "<", curses.color_pair(2))
+			mainBox.addstr(i, headerOffset + 3, "{}".format(total[tracker.selectedDay]["date"]))
+			mainBox.addstr(i, headerOffset + 12, ">".format(total[tracker.selectedDay]["date"]), curses.color_pair(2))
 			i+=2
 
 			mainBox.addstr(i, 2, "Projet", curses.color_pair(2))
@@ -102,7 +102,8 @@ def main(mainBox, config, radio, chat, tracker):
 					previousValue = a
 					i+=1
 					x+=1
-				mainBox.addstr(i + 1, 2 , "Currently working on {} since {}".format(tracker.current, tracker.last))
-
+				mainBox.addstr(i + 1, 2 , "En cours: {} - depuis {}".format(tracker.current, tracker.last))
+		else:
+			mainBox.addstr(i, 2, "Aucune activité, démarrer avec /workon <projet>")
 	mainBox.box()
 	mainBox.refresh()

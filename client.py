@@ -8,6 +8,7 @@ from radio import *
 from chat import *
 from manpage import *
 from activity import *
+from utils import *
 
 
 def main(stdscr):
@@ -84,6 +85,7 @@ def logicLoop(config, input_q, gui_q, radio, chat, tracker):
 	chat.sendMessage("/quit")
 	endTeams()
 
+
 def handleCommand(config, command, radio, chat, tracker):
 	if len(command) > 0 and command[0] == "/" and command[1:] in config["commands"]:
 		config["mode"] = config["commands"].index(command[1:])
@@ -91,28 +93,6 @@ def handleCommand(config, command, radio, chat, tracker):
 	else:
 		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker)
 
-def initTeams(stdscr, toolBox, mainBox, txtBox):
-	curses.noecho()
-	curses.cbreak()
-	stdscr.clear()
-	curses.curs_set(False)
-	txtBox.keypad(True)
-	toolBox.box()
-	mainBox.box()
-	txtBox.box()
-	toolBox.refresh()
-	txtBox.refresh()
-	mainBox.refresh()
-	if curses.has_colors():
-		curses.start_color()
-		curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
-		curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
-
-def endTeams():
-	curses.nocbreak()
-	curses.curs_set(True)
-	curses.endwin()
-	sys.exit(1)
 
 
 curses.wrapper(main)
