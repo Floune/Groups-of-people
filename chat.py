@@ -25,7 +25,7 @@ class Chat:
 
 
 
-def chatf(config, command, radio, chat, tracker):
+def chatf(config, command, radio, chat, tracker, todo):
 	config["mode"] = 2
 	if command and command not in config["arrows"]:
 		chat.sendMessage(command)

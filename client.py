@@ -9,6 +9,7 @@ from chat import *
 from manpage import *
 from activity import *
 from utils import *
+from todo import *
 
 
 def main(stdscr):
@@ -24,7 +25,7 @@ def main(stdscr):
 	config = {
 		'arrows' : ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT", "KEY_BACKSPACE"],
 		'debug': "debug zone",
-		'commands' : ['help', 'radio', 'chat', 'tracker'],
+		'commands' : ['help', 'radio', 'chat', 'tracker', 'todo'],
 		'modes': {
 			0 : {
 				"title": "Page Dead",
@@ -41,6 +42,10 @@ def main(stdscr):
 			3: {
 				"title": "Activity Tracker",
 				"func": trackf
+			},
+			4: {
+				"title": "Todo list",
+				"func": todof
 			}
 		},
 		'mode': 0
@@ -49,6 +54,7 @@ def main(stdscr):
 	radio = Radio()
 	chat = Chat(curses.LINES - 17, connection, gui_queue)
 	tracker = Tracker()
+	todo  = Todo()
 
 
 	#init windows
@@ -61,9 +67,9 @@ def main(stdscr):
 	#Tous les threads de ta vie
 	writeThread = threading.Thread(target=waitInput, args=(input_queue, txtBox))
 	writeThread.start()
-	logicThread = threading.Thread(target=logicLoop, args=(config, input_queue, gui_queue, radio, chat, tracker))
+	logicThread = threading.Thread(target=logicLoop, args=(config, input_queue, gui_queue, radio, chat, tracker, todo))
 	logicThread.start()
-	guiThread = threading.Thread(target=gui, args=(config, gui_queue, txtBox, toolBox, mainBox, radio, chat, tracker))
+	guiThread = threading.Thread(target=gui, args=(config, gui_queue, txtBox, toolBox, mainBox, radio, chat, tracker, todo))
 	guiThread.start()
 	receiveThread = threading.Thread(target=receiveChat, args=(connection, gui_queue, chat))
 	receiveThread.start()
@@ -73,12 +79,12 @@ def main(stdscr):
 	guiThread.join()
 
 
-def logicLoop(config, input_q, gui_q, radio, chat, tracker):
+def logicLoop(config, input_q, gui_q, radio, chat, tracker, todo):
 	command = ""
 	while command != "/quit":
 		command = input_q.get()
 
-		handleCommand(config, command, radio, chat, tracker)
+		handleCommand(config, command, radio, chat, tracker, todo)
 
 		gui_q.put(command)
 
@@ -86,12 +92,12 @@ def logicLoop(config, input_q, gui_q, radio, chat, tracker):
 	endTeams()
 
 
-def handleCommand(config, command, radio, chat, tracker):
+def handleCommand(config, command, radio, chat, tracker, todo):
 	if len(command) > 0 and command[0] == "/" and command[1:] in config["commands"]:
 		config["mode"] = config["commands"].index(command[1:])
-		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker)
+		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo)
 	else:
-		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker)
+		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo)
 
 
 

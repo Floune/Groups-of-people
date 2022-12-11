@@ -13,7 +13,7 @@ def updateInputLine(buffer, txtBox):
 
 def waitInput(q, txtBox):
 	buffer = []
-	arrows = ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT"]
+	arrows = ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT", "KEY_DC"]
 	last = -1
 	inp = ""
 	while inp != "/quit":

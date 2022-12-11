@@ -2,14 +2,14 @@ import curses
 from datetime import date, datetime
 
 
-def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker):
+def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker, todo):
 	command = ""
 	i=1
 
 	while command != "/quit":
 		tools(toolBox, config, chat)
 		command = gui_q.get()
-		main(mainBox, config, radio, chat, tracker)
+		main(mainBox, config, radio, chat, tracker, todo)
 		# if command:
 		# 	mainBox.addstr(i, 2, str(command))
 		# 	i+=1
@@ -25,11 +25,11 @@ def tools(toolBox, config, chat):
 	title = config["modes"][config["mode"]]["title"]
 	margin = int(curses.COLS / 2 - len(title) / 2)
 	toolBox.addstr(2, margin, title)
-	toolBox.addstr(2, 2, str(config["mode"]))
+	toolBox.addstr(2, 2, str(config["debug"]))
 	toolBox.box()
 	toolBox.refresh()
 
-def main(mainBox, config, radio, chat, tracker):
+def main(mainBox, config, radio, chat, tracker, todo):
 	if config["mode"] == 0:
 		help(config, mainBox)
 		
@@ -97,57 +97,148 @@ def main(mainBox, config, radio, chat, tracker):
 		else:
 			mainBox.addstr(i, 2, "Aucune activité, démarrer avec /workon <projet>")
 
+	elif config["mode"] == 4:
+		mainBox.clear()
+		mainBox.addstr(2, 2, "Todo")
+		mainBox.addstr(2, 50, "Status")
+		i = 4
+		if len(list(todo.todos.keys())) > 0:
+			for index, task in todo.todos.items():
+				if index == todo.selected:
+					mainBox.addstr(i, 2, f'{index} => {task["task"]}', curses.color_pair(2))
+				else:
+					mainBox.addstr(i, 2, f'{index} => {task["task"]}')
+
+				mainBox.addstr(i, 50, task["status"], curses.color_pair(task["color"]))
+				i+=1
+		else:
+			mainBox.addstr(i, 2, "Aucun todo en cours", curses.color_pair(2))
+			mainBox.addstr(i + 1, 2, "/todo <tache> pour commencer", curses.color_pair(2))
+
+
 def help(config, mainBox):
 	mainBox.clear()
 
 	wtf = {
 		0: {
 			"x": 2,
-			"y": 2,
-			"str": "Radio: /radio",
+			"y": 3,
+			"str": "Radio",
 			"color": curses.color_pair(3),
 		},
 		1: {
-			"x": 2,
+			"x": 40,
 			"y": 3,
-			"str": "Chat: /chat",
-			"color": curses.color_pair(3),
+			"str": "/radio",
+			"color": curses.color_pair(5),
 		},
 		2: {
 			"x": 2,
 			"y": 4,
-			"str": "Aide: /help",
+			"str": "Chat",
 			"color": curses.color_pair(3),
 		},
 		3: {
+			"x": 40,
+			"y": 4,
+			"str": "/chat",
+			"color": curses.color_pair(5),
+		},
+		4: {
 			"x": 2,
-			"y": 6,
-			"str": "Démarrer le tracker: /workon <project>",
+			"y": 5,
+			"str": "Aide",
 			"color": curses.color_pair(3),
 		},
 		5: {
-			"x": 2,
-			"y": 7,
-			"str": "Undo: /undo",
-			"color": curses.color_pair(3),
+			"x": 40,
+			"y": 5,
+			"str": "/help",
+			"color": curses.color_pair(5),
 		},
 		6: {
 			"x": 2,
-			"y": 8,
-			"str": "Quitter: /quit",
+			"y": 6,
+			"str": "Todo list",
 			"color": curses.color_pair(3),
 		},
 		7: {
-			"x": 2,
-			"y": 1,
-			"str": "Commandes",
-			"color": curses.color_pair(2),
+			"x": 40,
+			"y": 6,
+			"str": "/todo",
+			"color": curses.color_pair(5),
 		},
 		8: {
 			"x": 2,
-			"y": 5,
-			"str": "Activity Tracker: /tracker",
+			"y": 8,
+			"str": "Démarrer le tracker",
 			"color": curses.color_pair(3),
+		},
+		9: {
+			"x": 40,
+			"y": 8,
+			"str": "/workon <project>",
+			"color": curses.color_pair(5),
+		},
+		10: {
+			"x": 2,
+			"y": 7,
+			"str": "Activity Tracker",
+			"color": curses.color_pair(3),
+		},
+		11: {
+			"x": 40,
+			"y": 7,
+			"str": "/tracker",
+			"color": curses.color_pair(5),
+		},
+		12: {
+			"x": 2,
+			"y": 9,
+			"str": "Undo",
+			"color": curses.color_pair(3),
+		},
+		13: {
+			"x": 40,
+			"y": 9,
+			"str": "/undo",
+			"color": curses.color_pair(5),
+		},
+		14: {
+			"x": 2,
+			"y": 10,
+			"str": "Nouveau todo",
+			"color": curses.color_pair(3),
+		},
+		15: {
+			"x": 40,
+			"y": 10,
+			"str": "/todo <tache>",
+			"color": curses.color_pair(5),
+		},
+		16: {
+			"x": 2,
+			"y": 11,
+			"str": "Quitter",
+			"color": curses.color_pair(3),
+		},
+		17: {
+			"x": 40,
+			"y": 11,
+			"str": "/quit",
+			"color": curses.color_pair(5),
+		},
+		18: {
+			"x": 2,
+			"y": 1,
+			"str": "Action",
+			"color": curses.color_pair(3),
+		},
+		19: {
+			"x": 40,
+			"y": 1,
+			"str": "Commande",
+			"color": curses.color_pair(5),
 		},
 
 	}
