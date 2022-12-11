@@ -69,6 +69,8 @@ class Todo:
 					}
 				}
 			self.todos.update(update)
+			with open(self.datafile, "w") as json_file:				
+				json.dump(self.todos, json_file)
 
 	def done(self):
 		self.todos.pop(self.selected, None)
