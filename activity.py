@@ -61,6 +61,10 @@ class Tracker:
 				self.hasToday = True
 			with open(self.datafile, "w") as json_file:				
 				json.dump(self.total, json_file)
+			for i, d in enumerate(self.total):
+				if d["date"] == self.today:
+					self.hasToday = True
+					self.selectedDay = i
 
 	def select(self, key):
 		if key == "KEY_DOWN" or key == "KEY_RIGHT":

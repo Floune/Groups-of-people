@@ -8,11 +8,13 @@ def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker):
 
 	while command != "/quit":
 		tools(toolBox, config, chat)
-		main(mainBox, config, radio, chat, tracker)
 		command = gui_q.get()
+		main(mainBox, config, radio, chat, tracker)
 		# if command:
 		# 	mainBox.addstr(i, 2, str(command))
 		# 	i+=1
+		mainBox.box()
+		mainBox.refresh()
 		txtBox.clear()
 		txtBox.box()
 		txtBox.refresh()
@@ -29,21 +31,10 @@ def tools(toolBox, config, chat):
 
 def main(mainBox, config, radio, chat, tracker):
 	if config["mode"] == 0:
-		mainBox.clear()
-		mainBox.addstr(2, 2, "Navigation", curses.color_pair(2))
-		mainBox.addstr(4, 2, "Radio : /radio")
-		mainBox.addstr(5, 2, "Chat : /chat")
-		mainBox.addstr(6, 2, "Aide : /help")
-		mainBox.addstr(7, 2, "Tracker : /tracker")
-
-		mainBox.addstr(9, 2, "Activity tracker", curses.color_pair(2))
-		mainBox.addstr(11, 2, "Tracker un projet : /workon <project>")
-		mainBox.addstr(12, 2, "Changer de semaine : flèches gauche/droite")
-		mainBox.addstr(13, 2, "Undo : /undo")
-
-		mainBox.addstr(14, 2, "Quitter : /quit")
-
+		help(config, mainBox)
+		
 	elif config["mode"] == 1:
+		wtf = {}
 		mainBox.clear()
 		mainBox.addstr(1, 1, "Radio: {}".format(radio.currentlyPlaying))
 		mainBox.addstr(2, 1, "Chanson: {}".format(radio.song))
@@ -105,5 +96,60 @@ def main(mainBox, config, radio, chat, tracker):
 				mainBox.addstr(i + 1, 2 , "En cours: {} - depuis {}".format(tracker.current, tracker.last))
 		else:
 			mainBox.addstr(i, 2, "Aucune activité, démarrer avec /workon <projet>")
-	mainBox.box()
-	mainBox.refresh()
+
+def help(config, mainBox):
+	mainBox.clear()
+
+	wtf = {
+		0: {
+			"x": 2,
+			"y": 2,
+			"str": "Radio: /radio",
+			"color": curses.color_pair(3),
+		},
+		1: {
+			"x": 2,
+			"y": 3,
+			"str": "Chat: /chat",
+			"color": curses.color_pair(3),
+		},
+		2: {
+			"x": 2,
+			"y": 4,
+			"str": "Aide: /help",
+			"color": curses.color_pair(3),
+		},
+		3: {
+			"x": 2,
+			"y": 6,
+			"str": "Démarrer le tracker: /workon <project>",
+			"color": curses.color_pair(3),
+		},
+		5: {
+			"x": 2,
+			"y": 7,
+			"str": "Undo: /undo",
+			"color": curses.color_pair(3),
+		},
+		6: {
+			"x": 2,
+			"y": 8,
+			"str": "Quitter: /quit",
+			"color": curses.color_pair(3),
+		},
+		7: {
+			"x": 2,
+			"y": 1,
+			"str": "Commandes",
+			"color": curses.color_pair(2),
+		},
+		8: {
+			"x": 2,
+			"y": 5,
+			"str": "Activity Tracker: /tracker",
+			"color": curses.color_pair(3),
+		},
+
+	}
+	for key, line in wtf.items():
+		mainBox.addstr(line["y"], line["x"], line["str"], line["color"])
