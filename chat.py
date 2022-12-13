@@ -11,6 +11,7 @@ class Chat:
 		self.connection = connection
 		self.messages = []
 		self.connected = []
+		self.selectedConnectedUser = -1
 		self.nickname = ""
 
 	def sendMessage(self, msg):
@@ -23,12 +24,20 @@ class Chat:
 			if len(self.messages) > self.maxMessages:
 				self.messages.pop(0)
 
-
+	def select(self, key):
+		if key == "KEY_DOWN" or key == "KEY_RIGHT":
+			if self.selectedConnectedUser < len(self.connected) - 1:
+				self.selectedConnectedUser += 1
+		if key == "KEY_UP" or key == "KEY_LEFT":
+			if self.selectedConnectedUser > -1:
+				self.selectedConnectedUser -= 1
 
 
 def chatf(config, command, radio, chat, tracker, todo):
 	config["mode"] = 2
-	if command and command not in config["arrows"]:
+	if command in config["arrows"]:
+		chat.select(command)
+	elif command and command not in config["arrows"]:
 		chat.sendMessage(command)
 
 def receiveChat(connection, gui_q, chat):

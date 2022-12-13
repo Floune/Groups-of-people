@@ -26,7 +26,13 @@ def tools(toolBox, config, chat):
 	margin = int(curses.COLS / 2 - len(title) / 2)
 	toolBox.addstr(2, margin, title)
 	if config["mode"] == 2:
-		toolBox.addstr(3, margin -14, "({} {})".format(len(chat.connected), "utilisateurs connectés" if len(chat.connected) > 1 else "utilisateur connecté"))
+		toolBox.addstr(3, 2, "<", curses.color_pair(1)) 
+		if chat.selectedConnectedUser == -1:
+			toolBox.addstr(3, 4, "{} {}".format(len(chat.connected), "utilisateurs connectés" if len(chat.connected) > 1 else "utilisateur connecté"))
+			toolBox.addstr(3, 29, ">", curses.color_pair(1)) 
+		elif chat.selectedConnectedUser >= 0 and chat.selectedConnectedUser < len(chat.connected):
+			toolBox.addstr(3, 4, "{}".format(chat.connected[chat.selectedConnectedUser]), curses.color_pair((chat.connected.index(chat.connected[chat.selectedConnectedUser]) + 1)))
+			toolBox.addstr(3, 5 + len(chat.connected[chat.selectedConnectedUser]), ">", curses.color_pair(1)) 
 
 	toolBox.box()
 	toolBox.refresh()
