@@ -25,7 +25,9 @@ def tools(toolBox, config, chat):
 	title = config["modes"][config["mode"]]["title"]
 	margin = int(curses.COLS / 2 - len(title) / 2)
 	toolBox.addstr(2, margin, title)
-	toolBox.addstr(2, 2, str(config["debug"]))
+	if config["mode"] == 2:
+		toolBox.addstr(3, margin -14, "({} {})".format(len(chat.connected), "utilisateurs connectés" if len(chat.connected) > 1 else "utilisateur connecté"))
+
 	toolBox.box()
 	toolBox.refresh()
 
@@ -41,7 +43,7 @@ def main(mainBox, config, radio, chat, tracker, todo):
 		i = 4
 		for r, url in radio.radios.items():
 			if radio.selected == i - 3:
-				mainBox.addstr(i, 4, "{}".format(r), curses.color_pair(2))
+				mainBox.addstr(i, 4, "{}".format(r), curses.color_pair(1))
 			else:
 				mainBox.addstr(i, 4, "{}".format(r))
 			mainBox.addstr(i, 1, "{}".format("->"))
@@ -55,11 +57,17 @@ def main(mainBox, config, radio, chat, tracker, todo):
 				splited = m.split(" - ")
 				sender = splited[0]
 				msg = splited[1]
-				if sender == chat.nickname:
-					mainBox.addstr(i, 1, str(sender), curses.color_pair(2))
+				# if sender == chat.nickname:
+				# 	mainBox.addstr(i, 1, str(sender), curses.color_pair(2))
+				# else:
+				config["debug"] = sender
+				if not sender in chat.connected:
+					mainBox.addstr(i, 1, str(sender), curses.color_pair(7))
+					mainBox.addstr(i, 2 + len(sender), str(msg))
+					mainBox.addstr(i, 3 + len(sender) + len(str(msg)), "(hors ligne)", curses.color_pair(7))
 				else:
-					mainBox.addstr(i, 1, str(sender), curses.color_pair(1))
-				mainBox.addstr(i, 2 + len(sender), str(msg))
+					mainBox.addstr(i, 1, str(sender), curses.color_pair((chat.connected.index(sender) + 1)))
+					mainBox.addstr(i, 2 + len(sender), str(msg))
 				if len(m) > curses.COLS:
 					i += 2
 				else:
@@ -72,13 +80,13 @@ def main(mainBox, config, radio, chat, tracker, todo):
 		total = tracker.getActivity()
 		if len(tracker.getActivity()) > 0:
 			headerOffset = 7 
-			mainBox.addstr(i, headerOffset + 1, "<", curses.color_pair(2))
+			mainBox.addstr(i, headerOffset + 1, "<", curses.color_pair(1))
 			mainBox.addstr(i, headerOffset + 3, "{}".format(total[tracker.selectedDay]["date"]))
-			mainBox.addstr(i, headerOffset + 12, ">".format(total[tracker.selectedDay]["date"]), curses.color_pair(2))
+			mainBox.addstr(i, headerOffset + 12, ">".format(total[tracker.selectedDay]["date"]), curses.color_pair(1))
 			i+=2
 
-			mainBox.addstr(i, 2, "Projet", curses.color_pair(2))
-			mainBox.addstr(i, 20, "Durée", curses.color_pair(2))
+			mainBox.addstr(i, 2, "Projet", curses.color_pair(1))
+			mainBox.addstr(i, 20, "Durée", curses.color_pair(1))
 			i+=2
 			if len(total[tracker.selectedDay]["activity"]) == 1:
 				for k, a in total[tracker.selectedDay]["activity"].items():
@@ -105,15 +113,15 @@ def main(mainBox, config, radio, chat, tracker, todo):
 		if len(list(todo.todos.keys())) > 0:
 			for index, task in todo.todos.items():
 				if index == todo.selected:
-					mainBox.addstr(i, 2, f'{index} => {task["task"]}', curses.color_pair(2))
+					mainBox.addstr(i, 2, f'{index} => {task["task"]}', curses.color_pair(1))
 				else:
 					mainBox.addstr(i, 2, f'{index} => {task["task"]}')
 
 				mainBox.addstr(i, 50, task["status"], curses.color_pair(task["color"]))
 				i+=1
 		else:
-			mainBox.addstr(i, 2, "Aucun todo en cours", curses.color_pair(2))
-			mainBox.addstr(i + 1, 2, "/todo <tache> pour commencer", curses.color_pair(2))
+			mainBox.addstr(i, 2, "Aucun todo en cours", curses.color_pair(1))
+			mainBox.addstr(i + 1, 2, "/todo <tache> pour commencer", curses.color_pair(1))
 
 
 def help(config, mainBox):
@@ -124,7 +132,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 3,
 			"str": "Radio",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		1: {
 			"x": 40,
@@ -136,7 +144,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 4,
 			"str": "Chat",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		3: {
 			"x": 40,
@@ -148,7 +156,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 5,
 			"str": "Aide",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		5: {
 			"x": 40,
@@ -160,7 +168,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 6,
 			"str": "Todo list",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		7: {
 			"x": 40,
@@ -172,7 +180,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 8,
 			"str": "Démarrer le tracker",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		9: {
 			"x": 40,
@@ -184,7 +192,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 7,
 			"str": "Activity Tracker",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		11: {
 			"x": 40,
@@ -196,7 +204,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 9,
 			"str": "Undo",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		13: {
 			"x": 40,
@@ -208,7 +216,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 10,
 			"str": "Nouveau todo",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		15: {
 			"x": 40,
@@ -220,7 +228,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 11,
 			"str": "Quitter",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		17: {
 			"x": 40,
@@ -232,7 +240,7 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 1,
 			"str": "Action",
-			"color": curses.color_pair(3),
+			"color": curses.color_pair(0),
 		},
 		19: {
 			"x": 40,

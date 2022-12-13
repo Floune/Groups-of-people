@@ -10,6 +10,7 @@ class Chat:
 		self.gui_q = gui_q
 		self.connection = connection
 		self.messages = []
+		self.connected = []
 		self.nickname = ""
 
 	def sendMessage(self, msg):
@@ -40,6 +41,9 @@ def receiveChat(connection, gui_q, chat):
 				if "###nickname###" in decoded:
 					splited = decoded.split(" - ")
 					chat.nickname = splited[1]
+				elif "###connected###" in decoded:
+					splited = decoded.split(" - ")
+					chat.connected = splited[1].split(", ")
 				else:
 					chat.addMessage(decoded)
 				gui_q.put("q")
