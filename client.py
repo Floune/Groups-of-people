@@ -83,7 +83,7 @@ def logicLoop(config, input_q, gui_q, radio, chat, tracker, todo):
 	command = ""
 	while command != "/quit":
 		command = input_q.get()
-
+		
 		handleCommand(config, command, radio, chat, tracker, todo)
 
 		gui_q.put(command)

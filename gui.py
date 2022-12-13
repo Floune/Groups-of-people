@@ -101,7 +101,8 @@ def main(mainBox, config, radio, chat, tracker, todo):
 					previousValue = a
 					i+=1
 					x+=1
-				mainBox.addstr(i + 1, 2 , "En cours: {} - depuis {}".format(tracker.current, tracker.last))
+				mainBox.addstr(i + 1, 2 , "En cours depuis {} :".format(tracker.last), curses.color_pair(6))
+				mainBox.addstr(i + 1, 23 + len(tracker.last), "{}".format(tracker.current))
 		else:
 			mainBox.addstr(i, 2, "Aucune activité, démarrer avec /workon <projet>")
 
@@ -138,7 +139,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 3,
 			"str": "/radio",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		2: {
 			"x": 2,
@@ -150,7 +151,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 4,
 			"str": "/chat",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		4: {
 			"x": 2,
@@ -162,7 +163,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 5,
 			"str": "/help",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		6: {
 			"x": 2,
@@ -174,7 +175,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 6,
 			"str": "/todo",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		8: {
 			"x": 2,
@@ -186,7 +187,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 8,
 			"str": "/workon <project>",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		10: {
 			"x": 2,
@@ -198,7 +199,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 7,
 			"str": "/tracker",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		12: {
 			"x": 2,
@@ -210,7 +211,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 9,
 			"str": "/undo",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		14: {
 			"x": 2,
@@ -222,7 +223,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 10,
 			"str": "/todo <tache>",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		16: {
 			"x": 2,
@@ -234,7 +235,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 11,
 			"str": "/quit",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 		18: {
 			"x": 2,
@@ -246,7 +247,7 @@ def help(config, mainBox):
 			"x": 40,
 			"y": 1,
 			"str": "Commande",
-			"color": curses.color_pair(5),
+			"color": curses.color_pair(0),
 		},
 
 	}

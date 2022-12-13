@@ -35,6 +35,9 @@ class Tracker:
 					self.hasToday = True
 					self.selectedDay = i
 					self.activities = d["activity"].copy()
+					for k, v in self.activities.items():
+						self.current = v
+						self.last = k
 
 	def undo(self):
 		if len(self.activities) > 0:
@@ -43,6 +46,9 @@ class Tracker:
 			for k, v in self.activities.items():
 				self.current = v
 				self.last = k
+			for d in self.total:
+				if d["date"] == self.today:
+					 d["activity"] = self.activities
 
 
 
