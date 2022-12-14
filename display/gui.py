@@ -33,9 +33,11 @@ def tools(toolBox, config, chat):
 		if chat.selectedConnectedUser == -1:
 			toolBox.addstr(3, 4, "{} {}".format(len(chat.connected), "utilisateurs connectés" if len(chat.connected) > 1 else "utilisateur connecté"))
 			toolBox.addstr(3, 29, ">", curses.color_pair(1)) 
+
 		elif chat.selectedConnectedUser >= 0 and chat.selectedConnectedUser < len(chat.connected):
 			toolBox.addstr(3, 4, "{}".format(chat.connected[chat.selectedConnectedUser]), curses.color_pair((chat.connected.index(chat.connected[chat.selectedConnectedUser]) + 4)))
 			toolBox.addstr(3, 5 + len(chat.connected[chat.selectedConnectedUser]), ">", curses.color_pair(1)) 
+		toolBox.addstr(4, 2, "(notifications activées)" if config["annoy"] == True else "(notifications désactivées)")
 
 	toolBox.box()
 	toolBox.refresh()
@@ -154,121 +156,85 @@ def help(config, mainBox):
 			"x": 2,
 			"y": 3,
 			"str": "Radio",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		1: {
 			"x": 40,
 			"y": 3,
 			"str": "/radio",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		2: {
 			"x": 2,
 			"y": 4,
 			"str": "Chat",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		3: {
 			"x": 40,
 			"y": 4,
-			"str": "/chat",
-			"color": curses.color_pair(0),
+			"str": "/chat | /annoy",
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		4: {
 			"x": 2,
 			"y": 5,
 			"str": "Aide",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		5: {
 			"x": 40,
 			"y": 5,
 			"str": "/help",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		6: {
 			"x": 2,
 			"y": 6,
 			"str": "Todo list",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		7: {
 			"x": 40,
 			"y": 6,
-			"str": "/todo",
-			"color": curses.color_pair(0),
+			"str": "/todo | /todo <tache> | <ENTER> | <SUPPR>",
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		8: {
 			"x": 2,
-			"y": 8,
-			"str": "Démarrer le tracker",
-			"color": curses.color_pair(0),
+			"y": 7,
+			"str": "Activity tracker",
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		9: {
 			"x": 40,
-			"y": 8,
-			"str": "/workon <project>",
-			"color": curses.color_pair(0),
-		},
-		10: {
-			"x": 2,
 			"y": 7,
-			"str": "Activity Tracker",
-			"color": curses.color_pair(0),
-		},
-		11: {
-			"x": 40,
-			"y": 7,
-			"str": "/tracker",
-			"color": curses.color_pair(0),
-		},
-		12: {
-			"x": 2,
-			"y": 9,
-			"str": "Undo",
-			"color": curses.color_pair(0),
-		},
-		13: {
-			"x": 40,
-			"y": 9,
-			"str": "/undo",
-			"color": curses.color_pair(0),
-		},
-		14: {
-			"x": 2,
-			"y": 10,
-			"str": "Nouveau todo",
-			"color": curses.color_pair(0),
-		},
-		15: {
-			"x": 40,
-			"y": 10,
-			"str": "/todo <tache>",
-			"color": curses.color_pair(0),
+			"str": "/tracker | /workon <project> | /undo",
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		16: {
 			"x": 2,
-			"y": 11,
-			"str": "Matrix (pas de retour en arrière)",
-			"color": curses.color_pair(0),
+			"y": 8,
+			"str": "Matrix (glitchy)",
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		17: {
 			"x": 40,
-			"y": 11,
-			"str": "/neo",
-			"color": curses.color_pair(0),
+			"y": 8,
+			"str": "/neo | /reality",
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		18: {
 			"x": 2,
-			"y": 12,
+			"y": 9,
 			"str": "Quitter",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["action_color"]),
 		},
 		19: {
 			"x": 40,
-			"y": 12,
+			"y": 9,
 			"str": "/quit",
-			"color": curses.color_pair(0),
+			"color": curses.color_pair(config["manpage"]["command_color"]),
 		},
 		18: {
 			"x": 2,
@@ -282,6 +248,7 @@ def help(config, mainBox):
 			"str": "Commande",
 			"color": curses.color_pair(0),
 		},
+
 
 	}
 	for key, line in wtf.items():

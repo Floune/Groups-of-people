@@ -62,6 +62,11 @@ def main(stdscr):
 		'mode': 0,
 		'neo': True,
 		'neolor': 46,
+		'annoy': True,
+		'manpage' : {
+			'command_color': 33,
+			'action_color': 66,
+		}
 	}
 	
 	config["mt"] = threading.Thread(target=rain, args=(mainBox, config))
@@ -83,7 +88,7 @@ def main(stdscr):
 	logicThread.start()
 	guiThread = threading.Thread(target=gui, args=(config, gui_queue, txtBox, toolBox, mainBox, radio, chat, tracker, todo))
 	guiThread.start()
-	receiveThread = threading.Thread(target=receiveChat, args=(connection, gui_queue, chat))
+	receiveThread = threading.Thread(target=receiveChat, args=(connection, gui_queue, chat, config))
 	receiveThread.start()
 	writeThread.join()
 	receiveThread.join()

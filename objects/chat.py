@@ -37,16 +37,17 @@ def chatf(config, command, radio, chat, tracker, todo):
 	config["mode"] = 2
 	if command in config["arrows"]:
 		chat.select(command)
+	elif command == "/annoy":
+		config["annoy"] = not config["annoy"]
 	elif command and command not in config["arrows"]:
 		chat.sendMessage(command)
 
-def receiveChat(connection, gui_q, chat):
+def receiveChat(connection, gui_q, chat, config):
 	while True:
 		try:
 			msg = connection.recv(1024)
 			if msg:
 				decoded = msg.decode()
-				maybePlaySound(decoded)
 				if "###nickname###" in decoded:
 					splited = decoded.split(" - ")
 					chat.nickname = splited[1]
@@ -56,6 +57,7 @@ def receiveChat(connection, gui_q, chat):
 				else:
 					chat.addMessage(decoded)
 				gui_q.put("q")
+				maybePlaySound(decoded, config, chat.nickname)
 			else:
 				connection.close()
 				break
@@ -65,19 +67,27 @@ def receiveChat(connection, gui_q, chat):
 			break
 
 
-def maybePlaySound(decoded):
-	keywords = ["lol", "^^", "haha", "prout", "bravo"]
-	sounds = {
-		"lol" : "laugh.mp3",
-		"^^": "laugh.mp3",
-		"haha": "laugh.mp3",
-		"prout": "fart.mp3",
-		"bravo": "applause.mp3"
-	}
+def maybePlaySound(decoded, config, nickname):
 	splited = decoded.split(" - ")
-	keyword = splited[1]
-	if keyword in keywords:
-		player = vlc.MediaPlayer(sounds[keyword])
+	sender = splited[0]
+	if nickname != sender and not "###" in sender and config["annoy"] == True and config["mode"] != 2:
+		player = vlc.MediaPlayer("message.mp3")
 		player.play()
-		time.sleep(2)
+		time.sleep(3)
 		player.release()
+	else:
+		keywords = ["lol", "^^", "haha", "prout", "bravo"]
+		sounds = {
+			"lol" : "laugh.mp3",
+			"^^": "laugh.mp3",
+			"haha": "laugh.mp3",
+			"prout": "fart.mp3",
+			"bravo": "applause.mp3"
+		}
+		splited = decoded.split(" - ")
+		keyword = splited[1]
+		if keyword in keywords:
+			player = vlc.MediaPlayer(sounds[keyword])
+			player.play()
+			time.sleep(2)
+			player.release()
