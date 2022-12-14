@@ -2,14 +2,16 @@ import socket, threading, queue
 import curses
 import sys
 import os
-from input import * 
-from gui import *
-from radio import *
-from chat import *
+from input.input import * 
+from display.gui import *
+from display.matrix import *
+from objects.radio import *
+from objects.chat import *
+from objects.activity import *
+from objects.todo import *
 from manpage import *
-from activity import *
-from utils import *
-from todo import *
+from utils.utils import *
+
 
 
 def main(stdscr):
@@ -21,11 +23,16 @@ def main(stdscr):
 	connection = socket.socket()
 	connection.connect((os.environ.get('FLOUNE_CHAT_SERVER', 'localhost'), int(os.environ.get('FLOUNE_CHAT_PORT', 13000))))
 	
+	#init windows
+	txtBox = curses.newwin(4, curses.COLS, curses.LINES - 5, 0)
+	toolBox = curses.newwin(7, curses.COLS, 0, 0)
+	mainBox = curses.newwin(curses.LINES - 12, curses.COLS, 7, 0)
+
 	#shared objects
 	config = {
 		'arrows' : ["KEY_UP","KEY_DOWN","KEY_LEFT","KEY_RIGHT", "KEY_BACKSPACE"],
 		'debug': "debug zone",
-		'commands' : ['help', 'radio', 'chat', 'tracker', 'todo'],
+		'commands' : ['help', 'radio', 'chat', 'tracker', 'todo', 'neo'],
 		'modes': {
 			0 : {
 				"title": "Page Dead",
@@ -46,25 +53,30 @@ def main(stdscr):
 			4: {
 				"title": "Todo list",
 				"func": todof
+			},
+			5: {
+				"title": "Here is an advanced Kung-fu lesson",
+				"func": matrix
 			}
 		},
-		'mode': 0
-
+		'mode': 0,
+		'neo': True,
+		'neolor': 46,
 	}
+	
+	config["mt"] = threading.Thread(target=rain, args=(mainBox, config))
 	radio = Radio()
 	chat = Chat(curses.LINES - 17, connection, gui_queue)
 	tracker = Tracker()
 	todo  = Todo()
 
 
-	#init windows
-	txtBox = curses.newwin(4, curses.COLS, curses.LINES - 5, 0)
-	toolBox = curses.newwin(7, curses.COLS, 0, 0)
-	mainBox = curses.newwin(curses.LINES - 12, curses.COLS, 7, 0)
+
 	initTeams(stdscr, toolBox, mainBox, txtBox)
 
 
 	#Tous les threads de ta vie
+	matrixThread = threading.Thread(target=rain, args=(mainBox, config))
 	writeThread = threading.Thread(target=waitInput, args=(input_queue, txtBox))
 	writeThread.start()
 	logicThread = threading.Thread(target=logicLoop, args=(config, input_queue, gui_queue, radio, chat, tracker, todo))
@@ -83,7 +95,7 @@ def logicLoop(config, input_q, gui_q, radio, chat, tracker, todo):
 	command = ""
 	while command != "/quit":
 		command = input_q.get()
-		
+
 		handleCommand(config, command, radio, chat, tracker, todo)
 
 		gui_q.put(command)
@@ -94,8 +106,11 @@ def logicLoop(config, input_q, gui_q, radio, chat, tracker, todo):
 
 def handleCommand(config, command, radio, chat, tracker, todo):
 	if len(command) > 0 and command[0] == "/" and command[1:] in config["commands"]:
-		config["mode"] = config["commands"].index(command[1:])
-		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo)
+		if (command != "/neo" and config["mode"] != 5) or (command != "/neo" and config["neo"] == False):
+			config["mode"] = config["commands"].index(command[1:])
+			config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo)
+		elif command == "/neo":
+			matrix(config, command, radio, chat, tracker, todo)
 	else:
 		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo)
 

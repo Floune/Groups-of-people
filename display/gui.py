@@ -1,5 +1,8 @@
 import curses
 from datetime import date, datetime
+from display.matrix import rain
+import threading
+from display.matrix import rain
 
 
 def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker, todo):
@@ -31,7 +34,7 @@ def tools(toolBox, config, chat):
 			toolBox.addstr(3, 4, "{} {}".format(len(chat.connected), "utilisateurs connectés" if len(chat.connected) > 1 else "utilisateur connecté"))
 			toolBox.addstr(3, 29, ">", curses.color_pair(1)) 
 		elif chat.selectedConnectedUser >= 0 and chat.selectedConnectedUser < len(chat.connected):
-			toolBox.addstr(3, 4, "{}".format(chat.connected[chat.selectedConnectedUser]), curses.color_pair((chat.connected.index(chat.connected[chat.selectedConnectedUser]) + 1)))
+			toolBox.addstr(3, 4, "{}".format(chat.connected[chat.selectedConnectedUser]), curses.color_pair((chat.connected.index(chat.connected[chat.selectedConnectedUser]) + 4)))
 			toolBox.addstr(3, 5 + len(chat.connected[chat.selectedConnectedUser]), ">", curses.color_pair(1)) 
 
 	toolBox.box()
@@ -72,7 +75,7 @@ def main(mainBox, config, radio, chat, tracker, todo):
 					mainBox.addstr(i, 2 + len(sender), str(msg))
 					mainBox.addstr(i, 3 + len(sender) + len(str(msg)), "(hors ligne)", curses.color_pair(7))
 				else:
-					mainBox.addstr(i, 1, str(sender), curses.color_pair((chat.connected.index(sender) + 1)))
+					mainBox.addstr(i, 1, str(sender), curses.color_pair((chat.connected.index(sender) + 4)))
 					mainBox.addstr(i, 2 + len(sender), str(msg))
 				if len(m) > curses.COLS:
 					i += 2
@@ -92,23 +95,25 @@ def main(mainBox, config, radio, chat, tracker, todo):
 			i+=2
 
 			mainBox.addstr(i, 2, "Projet", curses.color_pair(1))
-			mainBox.addstr(i, 20, "Durée", curses.color_pair(1))
+			mainBox.addstr(i, 40, "Durée", curses.color_pair(1))
 			i+=2
 			if len(total[tracker.selectedDay]["activity"]) == 1:
 				for k, a in total[tracker.selectedDay]["activity"].items():
-					mainBox.addstr(i, 2, "Début de journée à {} sur {}".format(k, a))
+					mainBox.addstr(i + 1, 2 , "En cours depuis {} :".format(tracker.last), curses.color_pair(6))
+					mainBox.addstr(i + 1, 23 + len(tracker.last), "{}".format(tracker.current))
+		
 			else:
 				for k, a in total[tracker.selectedDay]["activity"].items():
 					if x > 0:
 						duree = datetime.strptime(k, '%H:%M:%S') - datetime.strptime(previousKey, '%H:%M:%S')
 						mainBox.addstr(i, 2, previousValue)
-						mainBox.addstr(i, 21,"{}".format(duree))
+						mainBox.addstr(i, 40,"{}".format(duree))
 					previousKey = k
 					previousValue = a
 					i+=1
 					x+=1
 				mainBox.addstr(i + 1, 2 , "En cours depuis {} :".format(tracker.last), curses.color_pair(6))
-				mainBox.addstr(i + 1, 23 + len(tracker.last), "{}".format(tracker.current))
+				mainBox.addstr(i + 1, 21 + len(tracker.last), "{}".format(tracker.current))
 		else:
 			mainBox.addstr(i, 2, "Aucune activité, démarrer avec /workon <projet>")
 
@@ -127,9 +132,19 @@ def main(mainBox, config, radio, chat, tracker, todo):
 				mainBox.addstr(i, 50, task["status"], curses.color_pair(task["color"]))
 				i+=1
 		else:
-			mainBox.addstr(i, 2, "Aucun todo en cours", curses.color_pair(1))
-			mainBox.addstr(i + 1, 2, "/todo <tache> pour commencer", curses.color_pair(1))
+			mainBox.addstr(i, 2, "Aucun todo en cours", curses.color_pair(100))
+			mainBox.addstr(i + 1, 2, "/todo <tache> pour commencer", curses.color_pair(100))
 
+	elif config["mode"] == 5:
+			t = config["mt"]
+			if not t.is_alive() and config["neo"] == True:
+				config["mt"] = threading.Thread(target=rain, args=(mainBox, config))
+				config["mt"].start()
+			elif config["neo"] == False:
+				mainBox.clear()
+				mainBox.addstr(int(curses.LINES / 2) - 10, int(curses.COLS / 2) - 10, "YOU LEFT THE MATRIX", curses.color_pair(46))
+				mainBox.addstr(int(curses.LINES / 2) - 9, int(curses.COLS / 2) - 10, "THERE IS NO GOING BACK", curses.color_pair(46))
+				mainBox.refresh
 
 def help(config, mainBox):
 	mainBox.clear()
@@ -234,12 +249,24 @@ def help(config, mainBox):
 		16: {
 			"x": 2,
 			"y": 11,
-			"str": "Quitter",
+			"str": "Matrix (pas de retour en arrière)",
 			"color": curses.color_pair(0),
 		},
 		17: {
 			"x": 40,
 			"y": 11,
+			"str": "/neo",
+			"color": curses.color_pair(0),
+		},
+		18: {
+			"x": 2,
+			"y": 12,
+			"str": "Quitter",
+			"color": curses.color_pair(0),
+		},
+		19: {
+			"x": 40,
+			"y": 12,
 			"str": "/quit",
 			"color": curses.color_pair(0),
 		},
