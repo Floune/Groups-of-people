@@ -94,7 +94,7 @@ class Todo:
 
 
 
-def todof(config, command, radio, chat, tracker, todo):	
+def todof(config, command, radio, chat, tracker, todo, manpage, pomodoro):	
 	config["mode"] = 4
 
 	if command in config["arrows"]:
@@ -105,7 +105,6 @@ def todof(config, command, radio, chat, tracker, todo):
 		todo.addTodo(command[6:])
 
 	elif command == "":
-		config["debug"] = "grougnu"
 		todo.toggle()
 
 	elif command == "KEY_DC":

@@ -3,7 +3,7 @@ import random
 import time
 import threading
 
-def matrix(config, command, radio, chat, tracker, todo):
+def matrix(config, command, radio, chat, tracker, todo, manpage):
 	config["mode"] = 5
 	if "/reality" in command:
 		config["mode"] = 0

@@ -6,6 +6,9 @@ def initTeams(stdscr, toolBox, mainBox, txtBox):
 		for i in range(0, curses.COLORS):
 		    curses.init_pair(i, i, -1);
 		curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+		curses.init_pair(10, curses.COLOR_BLACK, curses.COLOR_GREEN)
+		curses.init_pair(11, curses.COLOR_BLACK, curses.COLOR_RED)
+		curses.init_pair(12, curses.COLOR_BLACK, curses.COLOR_YELLOW)
 
 	curses.noecho()
 	curses.cbreak()

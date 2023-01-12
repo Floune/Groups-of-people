@@ -33,7 +33,7 @@ class Chat:
 				self.selectedConnectedUser -= 1
 
 
-def chatf(config, command, radio, chat, tracker, todo):
+def chatf(config, command, radio, chat, tracker, todo, manpage, pomodoro):
 	config["mode"] = 2
 	if command in config["arrows"]:
 		chat.select(command)

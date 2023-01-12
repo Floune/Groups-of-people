@@ -48,7 +48,7 @@ class Radio:
 
 	
 
-def radiof(config, command, radio, chat, tracker, todo):	
+def radiof(config, command, radio, chat, tracker, todo, manpage, pomodoro):	
 	config["mode"] = 1
 
 	if command in config["arrows"]:

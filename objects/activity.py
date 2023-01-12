@@ -2,7 +2,7 @@ from datetime import date, datetime
 import time
 import json
 
-def trackf(config, command, radio, chat, tracker, todo):
+def trackf(config, command, radio, chat, tracker, todo, manpage, pomodoro):
 	config["mode"] = 3
 	if command[:8] == "/workon ":
 		tracker.newActivity(command[8:])

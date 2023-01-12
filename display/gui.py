@@ -2,17 +2,18 @@ import curses
 from datetime import date, datetime
 from display.matrix import rain
 import threading
+import math
 from display.matrix import rain
 
 
-def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker, todo):
+def gui(config, gui_q, txtBox, toolBox, mainBox, radio, chat, tracker, todo, manpage, pomodoro):
 	command = ""
 	i=1
 
 	while command != "/quit":
 		tools(toolBox, config, chat)
 		command = gui_q.get()
-		main(mainBox, config, radio, chat, tracker, todo)
+		main(mainBox, config, radio, chat, tracker, todo, manpage, pomodoro)
 		# if command:
 		# 	mainBox.addstr(i, 2, str(command))
 		# 	i+=1
@@ -28,6 +29,7 @@ def tools(toolBox, config, chat):
 	title = config["modes"][config["mode"]]["title"]
 	margin = int(curses.COLS / 2 - len(title) / 2)
 	toolBox.addstr(2, margin, title)
+	toolBox.addstr(2, 2, config["debug"])
 	if config["mode"] == 2:
 		toolBox.addstr(3, 2, "<", curses.color_pair(1)) 
 		if chat.selectedConnectedUser == -1:
@@ -42,9 +44,9 @@ def tools(toolBox, config, chat):
 	toolBox.box()
 	toolBox.refresh()
 
-def main(mainBox, config, radio, chat, tracker, todo):
+def main(mainBox, config, radio, chat, tracker, todo, manpage, pomodoro):
 	if config["mode"] == 0:
-		help(config, mainBox)
+		help(config, mainBox, manpage)
 		
 	elif config["mode"] == 1:
 		wtf = {}
@@ -148,108 +150,180 @@ def main(mainBox, config, radio, chat, tracker, todo):
 				mainBox.addstr(int(curses.LINES / 2) - 9, int(curses.COLS / 2) - 10, "THERE IS NO GOING BACK", curses.color_pair(46))
 				mainBox.refresh
 
-def help(config, mainBox):
+	elif config["mode"] == 6:
+		numbers = [
+			[
+				[" ", "_", "_", "__  "],
+				[" ", "|", " ", "  | "],
+				[" ", "|", " ", "  | "],
+				[" ", "|", " ", "  | "],
+				[" ", "|", " ", "  | "],
+				[" ", "|_", "_", "__| "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", " ", " ", "    "],
+				[" ", " ", " ", "/|  "],
+				[" ", " ", "/", " |  "],
+				[" ", "/", " ", " |  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "__  "],
+				[" ", " ", " ", "  | "],
+				[" ", " _", "_", "__| "],
+				[" ", "|", " ", "    "],
+				[" ", "|", " ", "    "],
+				[" ", "|__", "_", "__  "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "__  "],
+				[" ", " ", " ", "  | "],
+				[" ", "_", "_", "__| "],
+				[" ", " ", " ", "  | "],
+				[" ", " ", " ", "  | "],
+				[" ", "_", "_", "__| "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", " ", " ", "    "],
+				[" ", "|", " ", "  | "],
+				[" ", "|_", "_", "__| "],
+				[" ", " ", " ", "  | "],
+				[" ", " ", " ", "  | "],
+				[" ", " ", " ", "  | "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "___ "],
+				[" ", "| ", "  ", "    "],
+				[" ", "|_", "_", "__  "],
+				[" ", " ", " ", "  | "],
+				[" ", " ", " ", "  | "],
+				[" ", "_", "_", "__| "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "__  "],
+				[" ", "|", "  ", "    "],
+				[" ", "|_", "_", "__  "],
+				[" ", "|", " ", "  | "],
+				[" ", "|", " ", "  | "],
+				[" ", "|_", "_", "__| "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "__  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", " |  "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "__  "],
+				[" ", "|", " ", "  | "],
+				[" ", "|_", "_", "__| "],
+				[" ", "|", " ", "  | "],
+				[" ", "|", " ", "  | "],
+				[" ", "|_", "_", "__| "],
+				[" ", " ", " ", "    "],
+			],
+			[
+				[" ", "_", "_", "__  "],
+				[" ", "|", " ", "  | "],
+				[" ", "|_", "_", "__| "],
+				[" ", " ", " ", "  | "],
+				[" ", " ", " ", "  | "],
+				[" ", "_", "_", "__| "],
+				[" ", " ", " ", "    "],
+			],
+			
+		]
+
+		points = [
+			"",
+			"",
+			" ",
+			"",
+			" ",
+			"",
+			"",
+		]
+		mainBox.clear()
+		if pomodoro.isPause == True:
+			mainBox.addstr(2, 2, "Break Time")
+		else:
+			mainBox.addstr(2, 2, "Pomodoro Time")
+
+		minutes = list(str(math.floor(pomodoro.duration / 60)))
+		if len(minutes) == 1:
+			minutes.insert(0, "0")
+		seconds = list(str(pomodoro.duration % 60))
+		if len(seconds) == 1:
+			seconds.insert(0, "0")
+		x = 0
+		for number in minutes:
+			y = 4
+			currentNumber = numbers[int(number)]
+			for line in currentNumber:
+				for index, char in enumerate(line):
+					if pomodoro.duration == 0:
+						mainBox.addstr(y, x + index + 3, char, curses.color_pair(11))
+					else:
+						if pomodoro.isPause == True:
+							mainBox.addstr(y, x + index + 3, char, curses.color_pair(12))
+						else:
+							mainBox.addstr(y, x + index + 3, char, curses.color_pair(10))
+				y+=1
+			x+=8
+
+		y = 2
+		x+=3
+		for i, ch in enumerate(points):
+			mainBox.addstr(y + i, x, ch, curses.color_pair(10))
+			y+=1
+
+		for second in seconds:
+			y = 4
+			currentNumber = numbers[int(second)]
+			for line in currentNumber:
+				for index, char in enumerate(line):
+					if pomodoro.duration == 0:
+						mainBox.addstr(y, x + index + 3, char, curses.color_pair(11))
+					else:
+						if pomodoro.isPause == True:
+							mainBox.addstr(y, x + index + 3, char, curses.color_pair(12))
+						else:
+							mainBox.addstr(y, x + index + 3, char, curses.color_pair(10))
+				y+=1
+			x+=8
+
+		y += 2
+		x = 2
+		
+		for i, command in enumerate(pomodoro.commands):
+			if pomodoro.selected == i:
+				mainBox.addstr(y, x, command, curses.color_pair(1))
+			else:
+				mainBox.addstr(y, x, command)
+			x += len(command)
+			x += 4
+
+		# mainBox.addstr(4, 4, minutes[0])
+		# mainBox.addstr(4, 7, seconds[0])
+		mainBox.refresh()
+
+
+
+def help(config, mainBox, manpage):
 	mainBox.clear()
-
-	wtf = {
-		0: {
-			"x": 2,
-			"y": 3,
-			"str": "Radio",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		1: {
-			"x": 40,
-			"y": 3,
-			"str": "/radio",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		2: {
-			"x": 2,
-			"y": 4,
-			"str": "Chat",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		3: {
-			"x": 40,
-			"y": 4,
-			"str": "/chat | /annoy",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		4: {
-			"x": 2,
-			"y": 5,
-			"str": "Aide",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		5: {
-			"x": 40,
-			"y": 5,
-			"str": "/help",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		6: {
-			"x": 2,
-			"y": 6,
-			"str": "Todo list",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		7: {
-			"x": 40,
-			"y": 6,
-			"str": "/todo | /todo <tache> | <ENTER> | <SUPPR>",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		8: {
-			"x": 2,
-			"y": 7,
-			"str": "Activity tracker",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		9: {
-			"x": 40,
-			"y": 7,
-			"str": "/tracker | /workon <project> | /undo",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		16: {
-			"x": 2,
-			"y": 8,
-			"str": "Matrix (glitchy)",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		17: {
-			"x": 40,
-			"y": 8,
-			"str": "/neo | /reality",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		18: {
-			"x": 2,
-			"y": 9,
-			"str": "Quitter",
-			"color": curses.color_pair(config["manpage"]["action_color"]),
-		},
-		19: {
-			"x": 40,
-			"y": 9,
-			"str": "/quit",
-			"color": curses.color_pair(config["manpage"]["command_color"]),
-		},
-		18: {
-			"x": 2,
-			"y": 1,
-			"str": "Action",
-			"color": curses.color_pair(0),
-		},
-		19: {
-			"x": 40,
-			"y": 1,
-			"str": "Commande",
-			"color": curses.color_pair(0),
-		},
-
-
-	}
-	for key, line in wtf.items():
-		mainBox.addstr(line["y"], line["x"], line["str"], line["color"])
+	mainBox.addstr(1, 3, "Action\t\t\t\tCommande")
+	for i, line in enumerate(manpage.lines):
+		if manpage.selected == i:
+			mainBox.addstr(line["y"], 1, "->", curses.color_pair(1))
+		mainBox.addstr(line["y"], line["x"], line["str"], curses.color_pair(line["color"]))
