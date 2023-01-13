@@ -12,8 +12,9 @@ from objects.todo import *
 from objects.manpage import *
 from utils.utils import *
 from objects.pomodoro import *
+from dotenv import load_dotenv
 
-
+load_dotenv() 
 
 def main(stdscr):
 	#Queues
