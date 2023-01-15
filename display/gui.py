@@ -256,9 +256,9 @@ def main(mainBox, config, radio, chat, tracker, todo, manpage, pomodoro):
 		]
 		mainBox.clear()
 		if pomodoro.isPause == True:
-			mainBox.addstr(2, 2, "Break Time")
+			mainBox.addstr(2, 2, "Break Time - mode {}".format("automatique" if pomodoro.auto else "manuel"))
 		else:
-			mainBox.addstr(2, 2, "Pomodoro Time")
+			mainBox.addstr(2, 2, "Pomodoro Time - mode {}".format("automatique" if pomodoro.auto else "manuel"))
 
 		minutes = list(str(math.floor(pomodoro.duration / 60)))
 		if len(minutes) == 1:
@@ -275,7 +275,9 @@ def main(mainBox, config, radio, chat, tracker, todo, manpage, pomodoro):
 					if pomodoro.duration == 0:
 						mainBox.addstr(y, x + index + 3, char, curses.color_pair(11))
 					else:
-						if pomodoro.isPause == True:
+						if pomodoro.isPaused == True:
+							mainBox.addstr(y, x + index + 3, char, curses.color_pair(13))
+						elif pomodoro.isPause == True:
 							mainBox.addstr(y, x + index + 3, char, curses.color_pair(12))
 						else:
 							mainBox.addstr(y, x + index + 3, char, curses.color_pair(10))
@@ -296,7 +298,9 @@ def main(mainBox, config, radio, chat, tracker, todo, manpage, pomodoro):
 					if pomodoro.duration == 0:
 						mainBox.addstr(y, x + index + 3, char, curses.color_pair(11))
 					else:
-						if pomodoro.isPause == True:
+						if pomodoro.isPaused == True:
+							mainBox.addstr(y, x + index + 3, char, curses.color_pair(13))
+						elif pomodoro.isPause == True:
 							mainBox.addstr(y, x + index + 3, char, curses.color_pair(12))
 						else:
 							mainBox.addstr(y, x + index + 3, char, curses.color_pair(10))

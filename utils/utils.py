@@ -9,6 +9,7 @@ def initTeams(stdscr, toolBox, mainBox, txtBox):
 		curses.init_pair(10, curses.COLOR_BLACK, curses.COLOR_GREEN)
 		curses.init_pair(11, curses.COLOR_BLACK, curses.COLOR_RED)
 		curses.init_pair(12, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+		curses.init_pair(13, curses.COLOR_BLACK, curses.COLOR_BLUE)
 
 	curses.noecho()
 	curses.cbreak()
