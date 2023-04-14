@@ -119,7 +119,7 @@ def handleCommand(config, command, radio, chat, tracker, todo, manpage, pomodoro
 			config["mode"] = config["commands"].index(command[1:])
 			config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo, manpage, pomodoro)
 		elif command == "/neo":
-			matrix(config, command, radio, chat, tracker, todo, manpage)
+			matrix(config, command, radio, chat, tracker, todo, manpage, pomodoro)
 	else:
 		config["modes"][config["mode"]]["func"](config, command, radio, chat, tracker, todo, manpage, pomodoro)
 
